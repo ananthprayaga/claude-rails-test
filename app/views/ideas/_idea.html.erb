@@ -1,0 +1,19 @@
+<article id="<%= dom_id idea %>" class="card flex flex-col gap-3 transition hover:-translate-y-0.5 hover:shadow-md">
+  <div class="flex items-center justify-between">
+    <%= status_badge(idea) %>
+    <%= star_button(idea) %>
+  </div>
+  <h3 class="text-lg font-semibold leading-snug">
+    <%= link_to idea.title, idea, class: "hover:text-indigo-600 dark:hover:text-indigo-400" %>
+  </h3>
+  <% if idea.description.present? %>
+    <p class="flex-1 text-sm text-slate-600 dark:text-slate-400"><%= truncate(idea.description, length: 160) %></p>
+  <% end %>
+  <div class="mt-auto flex flex-wrap items-center gap-3 border-t border-slate-100 pt-3 text-sm dark:border-slate-800">
+    <%= potential_stars(idea.potential) %>
+    <% if idea.category.present? %>
+      <%= link_to idea.category, ideas_path(category: idea.category), class: "tag" %>
+    <% end %>
+    <span class="ml-auto text-xs text-slate-400"><%= time_ago_in_words(idea.updated_at) %> ago</span>
+  </div>
+</article>

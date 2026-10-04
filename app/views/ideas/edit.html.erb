@@ -1,0 +1,6 @@
+<% content_for :title, "Edit #{@idea.title} · Idea Vault" %>
+
+<div class="card mx-auto max-w-3xl sm:p-8">
+  <h1 class="mb-6 text-2xl font-bold tracking-tight">Edit idea</h1>
+  <%= render "form", idea: @idea %>
+</div>

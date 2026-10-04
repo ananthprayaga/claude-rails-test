@@ -1,0 +1,52 @@
+<% content_for :title, "My Ideas · Idea Vault" %>
+
+<div class="mb-6">
+  <h1 class="text-3xl font-bold tracking-tight">My business ideas</h1>
+  <p class="mt-1 text-slate-500 dark:text-slate-400">Capture, rate, and track every idea from first spark to launch.</p>
+</div>
+
+<section class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+  <% active = "border-indigo-500 ring-1 ring-indigo-500" %>
+  <%= link_to ideas_path, class: ["card !p-3 transition hover:border-indigo-400", (active if params[:status].blank?)] do %>
+    <div class="text-2xl font-bold"><%= @total_count %></div>
+    <div class="text-xs text-slate-500 dark:text-slate-400">All ideas</div>
+  <% end %>
+  <% Idea::STATUSES.each do |key, label| %>
+    <%= link_to ideas_path(request.query_parameters.merge(status: key)), class: ["card !p-3 transition hover:border-indigo-400", (active if params[:status] == key)] do %>
+      <div class="text-2xl font-bold"><%= @status_counts.fetch(key, 0) %></div>
+      <div class="text-xs text-slate-500 dark:text-slate-400"><%= label %></div>
+    <% end %>
+  <% end %>
+</section>
+
+<%= form_with url: ideas_path, method: :get, class: "mb-8 flex flex-wrap items-center gap-2", data: { turbo_action: "advance" } do |f| %>
+  <%= f.search_field :q, value: params[:q], placeholder: "Search ideas…", class: "input flex-1 basis-60" %>
+  <%= f.select :status, options_for_select(Idea::STATUSES.invert, params[:status]), { include_blank: "Any status" }, class: "input w-auto" %>
+  <%= f.select :category, options_for_select(@categories, params[:category]), { include_blank: "Any category" }, class: "input w-auto" %>
+  <%= f.select :sort, options_for_select([["Newest", "newest"], ["Oldest", "oldest"], ["Highest potential", "potential"], ["Recently updated", "updated"], ["Title A–Z", "title"]], params[:sort]), {}, class: "input w-auto" %>
+  <label class="inline-flex items-center gap-2 px-2 text-sm">
+    <%= f.check_box :starred, { checked: params[:starred] == "1", class: "size-4 rounded accent-indigo-600" }, "1", nil %> Starred
+  </label>
+  <%= f.submit "Filter", class: "btn", name: nil %>
+  <% if request.query_parameters.except(:sort).values.any?(&:present?) %>
+    <%= link_to "Clear", ideas_path, class: "btn btn-ghost" %>
+  <% end %>
+<% end %>
+
+<% if @ideas.any? %>
+  <div id="ideas" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <%= render @ideas %>
+  </div>
+<% else %>
+  <div class="rounded-xl border-2 border-dashed border-slate-300 px-6 py-16 text-center dark:border-slate-700">
+    <% if @total_count.zero? %>
+      <div class="text-4xl">💡</div>
+      <h2 class="mt-3 text-lg font-semibold">No ideas yet</h2>
+      <p class="mt-1 text-slate-500 dark:text-slate-400">Every great business starts as a scribble. Capture your first one.</p>
+      <%= link_to "+ Add your first idea", new_idea_path, class: "btn btn-primary mt-6" %>
+    <% else %>
+      <h2 class="text-lg font-semibold">No matching ideas</h2>
+      <p class="mt-1 text-slate-500 dark:text-slate-400">Try a different search or <%= link_to "clear the filters", ideas_path, class: "text-indigo-600 hover:underline dark:text-indigo-400" %>.</p>
+    <% end %>
+  </div>
+<% end %>

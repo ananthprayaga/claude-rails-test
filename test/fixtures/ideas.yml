@@ -1,0 +1,21 @@
+one:
+  title: Plant subscription box
+  description: Monthly curated houseplants with care guides.
+  category: E-commerce
+  status: brainstorming
+  potential: 4
+  target_market: Urban renters
+  revenue_model: Subscription
+  notes: Check competitors.
+  starred: true
+
+two:
+  title: Invoice reminder SaaS
+  description: Automated polite payment reminders for freelancers.
+  category: SaaS
+  status: validating
+  potential: 3
+  target_market: Freelancers
+  revenue_model: Monthly plan
+  notes:
+  starred: false

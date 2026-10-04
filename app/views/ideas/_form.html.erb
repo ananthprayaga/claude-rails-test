@@ -1,0 +1,65 @@
+<%= form_with(model: idea, class: "space-y-5") do |form| %>
+  <% if idea.errors.any? %>
+    <div class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-950 dark:text-red-300">
+      <strong><%= pluralize(idea.errors.count, "error") %> prevented this idea from being saved:</strong>
+      <ul class="mt-2 list-disc pl-5">
+        <% idea.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :title, class: "label" %>
+    <%= form.text_field :title, class: "input", placeholder: "e.g. Subscription box for houseplants", autofocus: true %>
+  </div>
+
+  <div>
+    <%= form.label :description, "What's the idea?", class: "label" %>
+    <%= form.textarea :description, rows: 5, class: "input", placeholder: "The problem, the solution, why now…" %>
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-3">
+    <div>
+      <%= form.label :category, class: "label" %>
+      <%= form.text_field :category, class: "input", list: "category-options", placeholder: "e.g. SaaS" %>
+      <datalist id="category-options">
+        <% Idea.categories.each do |c| %><option value="<%= c %>"><% end %>
+      </datalist>
+    </div>
+    <div>
+      <%= form.label :status, class: "label" %>
+      <%= form.select :status, Idea::STATUSES.invert, {}, class: "input" %>
+    </div>
+    <div>
+      <%= form.label :potential, "Potential (1–5)", class: "label" %>
+      <%= form.select :potential, (1..5).map { |n| ["#{'★' * n}#{'☆' * (5 - n)}  #{n}", n] }, {}, class: "input" %>
+    </div>
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <%= form.label :target_market, class: "label" %>
+      <%= form.text_field :target_market, class: "input", placeholder: "Who would pay for this?" %>
+    </div>
+    <div>
+      <%= form.label :revenue_model, class: "label" %>
+      <%= form.text_field :revenue_model, class: "input", placeholder: "e.g. Subscription, marketplace fee" %>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :notes, class: "label" %>
+    <%= form.textarea :notes, rows: 4, class: "input", placeholder: "Competitors, links, next steps…" %>
+  </div>
+
+  <label class="inline-flex items-center gap-2 text-sm font-medium">
+    <%= form.check_box :starred, class: "size-4 rounded accent-indigo-600" %> Star this idea
+  </label>
+
+  <div class="flex items-center gap-2 border-t border-slate-100 pt-5 dark:border-slate-800">
+    <%= form.submit idea.new_record? ? "Save idea" : "Update idea", class: "btn btn-primary" %>
+    <%= link_to "Cancel", idea.new_record? ? ideas_path : idea, class: "btn btn-ghost" %>
+  </div>
+<% end %>
