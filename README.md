@@ -21,7 +21,7 @@ bin/rails db:seed      # optional: add a few sample ideas
 bin/dev                # starts the server and the Tailwind watcher
 ```
 
-Then open http://localhost:3000.
+Then open http://localhost:3000. In GitHub Codespaces, open the forwarded port 3000 link instead; the development config allows the Codespaces proxy so forms submit correctly.
 
 ## Tests
 
