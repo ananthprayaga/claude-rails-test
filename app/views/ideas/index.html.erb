@@ -1,52 +1,63 @@
-<% content_for :title, "My Ideas · Idea Vault" %>
+<% content_for :title, "Idea Vault" %>
+<% filtering = params.values_at(:q, :status, :category, :starred).any?(&:present?) %>
 
-<div class="mb-6">
-  <h1 class="text-3xl font-bold tracking-tight">My business ideas</h1>
-  <p class="mt-1 text-slate-500 dark:text-slate-400">Capture, rate, and track every idea from first spark to launch.</p>
+<div class="text-center">
+  <h1 class="text-4xl font-black tracking-tight sm:text-5xl">
+    <%= params[:starred] == "1" ? "Starred ideas" : "Your business ideas" %>
+  </h1>
+  <p class="mt-2 text-stone-500 dark:text-stone-400">
+    <%= pluralize(@total_count, "idea") %> captured · <%= @status_counts.fetch("launched", 0) %> launched
+  </p>
+  <div class="mt-5 flex justify-center">
+    <%= link_to "+ New idea", new_idea_path, class: "btn btn-go px-5 py-2 text-base" %>
+  </div>
 </div>
 
-<section class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
-  <% active = "border-indigo-500 ring-1 ring-indigo-500" %>
-  <%= link_to ideas_path, class: ["card !p-3 transition hover:border-indigo-400", (active if params[:status].blank?)] do %>
-    <div class="text-2xl font-bold"><%= @total_count %></div>
-    <div class="text-xs text-slate-500 dark:text-slate-400">All ideas</div>
-  <% end %>
-  <% Idea::STATUSES.each do |key, label| %>
-    <%= link_to ideas_path(request.query_parameters.merge(status: key)), class: ["card !p-3 transition hover:border-indigo-400", (active if params[:status] == key)] do %>
-      <div class="text-2xl font-bold"><%= @status_counts.fetch(key, 0) %></div>
-      <div class="text-xs text-slate-500 dark:text-slate-400"><%= label %></div>
-    <% end %>
-  <% end %>
-</section>
-
-<%= form_with url: ideas_path, method: :get, class: "mb-8 flex flex-wrap items-center gap-2", data: { turbo_action: "advance" } do |f| %>
-  <%= f.search_field :q, value: params[:q], placeholder: "Search ideas…", class: "input flex-1 basis-60" %>
-  <%= f.select :status, options_for_select(Idea::STATUSES.invert, params[:status]), { include_blank: "Any status" }, class: "input w-auto" %>
-  <%= f.select :category, options_for_select(@categories, params[:category]), { include_blank: "Any category" }, class: "input w-auto" %>
-  <%= f.select :sort, options_for_select([["Newest", "newest"], ["Oldest", "oldest"], ["Highest potential", "potential"], ["Recently updated", "updated"], ["Title A–Z", "title"]], params[:sort]), {}, class: "input w-auto" %>
-  <label class="inline-flex items-center gap-2 px-2 text-sm">
-    <%= f.check_box :starred, { checked: params[:starred] == "1", class: "size-4 rounded accent-indigo-600" }, "1", nil %> Starred
-  </label>
-  <%= f.submit "Filter", class: "btn", name: nil %>
-  <% if request.query_parameters.except(:sort).values.any?(&:present?) %>
-    <%= link_to "Clear", ideas_path, class: "btn btn-ghost" %>
-  <% end %>
+<%= form_with url: ideas_path, method: :get, class: "mx-auto mt-8 flex max-w-3xl flex-wrap items-center justify-center gap-2", data: { turbo_action: "advance" } do |f| %>
+  <%= f.hidden_field :status, value: params[:status] if params[:status].present? %>
+  <%= f.hidden_field :starred, value: "1" if params[:starred] == "1" %>
+  <%= f.search_field :q, value: params[:q], placeholder: "Find an idea…", class: "input flex-1 basis-64 rounded-full px-4" %>
+  <%= f.select :category, options_for_select(@categories, params[:category]), { include_blank: "All categories" }, class: "input w-auto rounded-full" %>
+  <%= f.select :sort, options_for_select([["Newest", "newest"], ["Oldest", "oldest"], ["Highest potential", "potential"], ["Recently updated", "updated"], ["Title A–Z", "title"]], params[:sort]), {}, class: "input w-auto rounded-full" %>
+  <%= f.submit "Search", class: "btn", name: nil %>
 <% end %>
 
+<nav class="mt-5 flex flex-wrap justify-center gap-1">
+  <%= link_to ideas_path(request.query_parameters.except(:status)), class: ["pill-tab", ("pill-tab-active" if params[:status].blank?)] do %>
+    All <span class="opacity-60"><%= @total_count %></span>
+  <% end %>
+  <% Idea::STATUSES.each do |key, label| %>
+    <%= link_to ideas_path(request.query_parameters.merge(status: key)), class: ["pill-tab", ("pill-tab-active" if params[:status] == key)] do %>
+      <%= label %> <span class="opacity-60"><%= @status_counts.fetch(key, 0) %></span>
+    <% end %>
+  <% end %>
+</nav>
+
 <% if @ideas.any? %>
-  <div id="ideas" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <%= render @ideas %>
-  </div>
+  <% if filtering %>
+    <h2 class="divider"><%= pluralize(@ideas.size, "match") %> · <%= link_to "clear", ideas_path, class: "normal-case tracking-normal text-link hover:underline" %></h2>
+    <div id="ideas" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"><%= render @ideas %></div>
+  <% else %>
+    <% starred, others = @ideas.partition(&:starred) %>
+    <% if starred.any? %>
+      <h2 class="divider">★ Starred</h2>
+      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"><%= render starred %></div>
+    <% end %>
+    <% if others.any? %>
+      <h2 class="divider"><%= starred.any? ? "Everything else" : "All ideas" %></h2>
+      <div id="ideas" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"><%= render others %></div>
+    <% end %>
+  <% end %>
 <% else %>
-  <div class="rounded-xl border-2 border-dashed border-slate-300 px-6 py-16 text-center dark:border-slate-700">
+  <div class="sheet mt-10 max-w-xl text-center">
+    <div class="text-5xl">💡</div>
     <% if @total_count.zero? %>
-      <div class="text-4xl">💡</div>
-      <h2 class="mt-3 text-lg font-semibold">No ideas yet</h2>
-      <p class="mt-1 text-slate-500 dark:text-slate-400">Every great business starts as a scribble. Capture your first one.</p>
-      <%= link_to "+ Add your first idea", new_idea_path, class: "btn btn-primary mt-6" %>
+      <h2 class="mt-4 text-2xl font-black">Every great business starts as a scribble</h2>
+      <p class="mt-2 text-stone-500 dark:text-stone-400">Capture your first idea. You can flesh it out later.</p>
+      <%= link_to "+ Add your first idea", new_idea_path, class: "btn btn-go mt-6" %>
     <% else %>
-      <h2 class="text-lg font-semibold">No matching ideas</h2>
-      <p class="mt-1 text-slate-500 dark:text-slate-400">Try a different search or <%= link_to "clear the filters", ideas_path, class: "text-indigo-600 hover:underline dark:text-indigo-400" %>.</p>
+      <h2 class="mt-4 text-2xl font-black">Nothing matches that</h2>
+      <p class="mt-2 text-stone-500 dark:text-stone-400">Try another search, or <%= link_to "see all your ideas", ideas_path, class: "btn-link" %>.</p>
     <% end %>
   </div>
 <% end %>

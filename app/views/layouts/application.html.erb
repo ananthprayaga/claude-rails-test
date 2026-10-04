@@ -19,23 +19,31 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="min-h-full bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
-    <header class="sticky top-0 z-10 border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-900/80">
+  <body class="min-h-full bg-cream font-sans text-ink antialiased dark:bg-night dark:text-stone-100">
+    <header class="border-b border-rule bg-paper/90 backdrop-blur dark:border-night-rule dark:bg-night-paper/90">
       <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <%= link_to root_path, class: "flex items-center gap-2 text-lg font-bold tracking-tight" do %>
-          <span class="text-2xl">💡</span> Idea Vault
+        <%= link_to root_path, class: "flex items-center gap-2 font-black tracking-tight sm:w-32" do %>
+          <span class="grid size-8 place-items-center rounded-full bg-amber-300 text-base">💡</span>
+          <span class="hidden sm:inline">Idea Vault</span>
         <% end %>
-        <%= link_to "+ New idea", new_idea_path, class: "btn btn-primary" %>
+        <nav class="flex items-center gap-1">
+          <%= nav_link "Home", root_path, icon: :home, active: current_page?(root_path) && params[:starred] != "1" %>
+          <%= nav_link "Starred", ideas_path(starred: "1"), icon: :star, active: params[:starred] == "1" %>
+          <%= nav_link "New idea", new_idea_path, icon: :plus, active: current_page?(new_idea_path) %>
+        </nav>
+        <div class="hidden w-32 sm:block"></div>
       </div>
     </header>
 
-    <main class="mx-auto max-w-6xl px-4 py-8">
-      <% if notice.present? %>
-        <p class="mb-6 rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"><%= notice %></p>
-      <% end %>
-      <% if alert.present? %>
-        <p class="mb-6 rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-800 dark:bg-red-950 dark:text-red-300"><%= alert %></p>
-      <% end %>
+    <% if notice.present? || alert.present? %>
+      <div class="pointer-events-none fixed inset-x-0 top-20 z-20 flex justify-center px-4">
+        <p class="rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white shadow-lg dark:bg-stone-100 dark:text-ink">
+          <%= notice.presence || alert %>
+        </p>
+      </div>
+    <% end %>
+
+    <main class="mx-auto max-w-6xl px-4 py-10">
       <%= yield %>
     </main>
   </body>

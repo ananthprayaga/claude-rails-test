@@ -1,6 +1,6 @@
 <% content_for :title, "New idea · Idea Vault" %>
 
-<div class="card mx-auto max-w-3xl sm:p-8">
-  <h1 class="mb-6 text-2xl font-bold tracking-tight">New idea</h1>
+<%= link_to "◂ All ideas", ideas_path, class: "sheet-tab" %>
+<div class="sheet">
   <%= render "form", idea: @idea %>
 </div>

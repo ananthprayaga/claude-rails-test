@@ -1,53 +1,46 @@
 <% content_for :title, "#{@idea.title} · Idea Vault" %>
 
-<div class="mx-auto max-w-3xl">
-  <%= link_to "← All ideas", ideas_path, class: "mb-4 inline-block text-sm text-slate-500 hover:text-indigo-600 dark:text-slate-400" %>
-
-  <article class="card sm:p-8">
-    <div class="flex items-center justify-between">
-      <%= status_badge(@idea) %>
-      <%= star_button(@idea) %>
-    </div>
-    <h1 class="mt-3 text-3xl font-bold tracking-tight"><%= @idea.title %></h1>
-    <div class="mt-3 flex flex-wrap items-center gap-3 text-sm">
-      <%= potential_stars(@idea.potential) %>
-      <% if @idea.category.present? %>
-        <%= link_to @idea.category, ideas_path(category: @idea.category), class: "tag" %>
-      <% end %>
-      <span class="text-slate-500 dark:text-slate-400">
-        Added <%= @idea.created_at.to_date.to_fs(:long) %> · updated <%= time_ago_in_words(@idea.updated_at) %> ago
-      </span>
-    </div>
-
-    <% if @idea.description.present? %>
-      <section class="mt-8">
-        <h2 class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">The idea</h2>
-        <div class="space-y-3 leading-relaxed"><%= simple_format @idea.description %></div>
-      </section>
-    <% end %>
-
-    <dl class="mt-8 grid gap-3 sm:grid-cols-2">
-      <div class="rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-800/60">
-        <dt class="text-xs text-slate-500">Target market</dt>
-        <dd class="font-medium"><%= @idea.target_market.presence || "—" %></dd>
-      </div>
-      <div class="rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-800/60">
-        <dt class="text-xs text-slate-500">Revenue model</dt>
-        <dd class="font-medium"><%= @idea.revenue_model.presence || "—" %></dd>
-      </div>
-    </dl>
-
-    <% if @idea.notes.present? %>
-      <section class="mt-8">
-        <h2 class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Notes</h2>
-        <div class="space-y-3 leading-relaxed"><%= simple_format @idea.notes %></div>
-      </section>
-    <% end %>
-
-    <div class="mt-8 flex items-center gap-2 border-t border-slate-100 pt-6 dark:border-slate-800">
+<%= link_to "◂ All ideas", ideas_path, class: "sheet-tab" %>
+<article class="sheet">
+  <div class="flex items-center justify-between gap-2 sm:absolute sm:inset-x-6 sm:top-5">
+    <%= star_button(@idea) %>
+    <div class="flex items-center gap-2">
       <%= link_to "Edit", edit_idea_path(@idea), class: "btn" %>
       <%= button_to "Delete", @idea, method: :delete, class: "btn btn-danger", form_class: "inline",
                     data: { turbo_confirm: "Delete \"#{@idea.title}\"? This can't be undone." } %>
     </div>
-  </article>
-</div>
+  </div>
+
+  <header class="mt-6 text-center sm:mt-4">
+    <h1 class="text-3xl font-black tracking-tight sm:text-4xl"><%= @idea.title %></h1>
+    <div class="mt-3 flex flex-wrap items-center justify-center gap-3">
+      <%= status_badge(@idea) %>
+      <%= potential_stars(@idea.potential) %>
+      <% if @idea.category.present? %>
+        <%= link_to @idea.category, ideas_path(category: @idea.category), class: "tag" %>
+      <% end %>
+    </div>
+    <p class="mt-2 text-xs text-stone-500 dark:text-stone-400">
+      Added <%= @idea.created_at.to_date.to_fs(:long) %> · last updated <%= time_ago_in_words(@idea.updated_at) %> ago
+    </p>
+  </header>
+
+  <div class="mt-8 border-t border-rule pt-8 dark:border-night-rule">
+    <% if @idea.description.present? %>
+      <div class="space-y-4 text-[17px] leading-relaxed"><%= simple_format @idea.description %></div>
+    <% else %>
+      <p class="text-center text-stone-500 italic">No description yet. <%= link_to "Add one", edit_idea_path(@idea), class: "btn-link not-italic" %></p>
+    <% end %>
+  </div>
+
+  <dl class="mt-8 grid gap-x-6 gap-y-3 border-t border-rule pt-8 sm:grid-cols-[10rem_1fr] dark:border-night-rule">
+    <dt class="text-sm font-bold text-stone-500 sm:text-right dark:text-stone-400">Who's it for?</dt>
+    <dd><%= @idea.target_market.presence || tag.span("Not decided yet", class: "text-stone-400") %></dd>
+    <dt class="text-sm font-bold text-stone-500 sm:text-right dark:text-stone-400">How it makes money</dt>
+    <dd><%= @idea.revenue_model.presence || tag.span("Not decided yet", class: "text-stone-400") %></dd>
+    <% if @idea.notes.present? %>
+      <dt class="text-sm font-bold text-stone-500 sm:text-right dark:text-stone-400">Notes</dt>
+      <dd class="space-y-3"><%= simple_format @idea.notes %></dd>
+    <% end %>
+  </dl>
+</article>

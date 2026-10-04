@@ -1,8 +1,8 @@
-<%= form_with(model: idea, class: "space-y-5") do |form| %>
+<%= form_with(model: idea) do |form| %>
   <% if idea.errors.any? %>
-    <div class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-950 dark:text-red-300">
-      <strong><%= pluralize(idea.errors.count, "error") %> prevented this idea from being saved:</strong>
-      <ul class="mt-2 list-disc pl-5">
+    <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
+      <strong><%= pluralize(idea.errors.count, "thing") %> to fix before saving:</strong>
+      <ul class="mt-1 list-disc pl-5">
         <% idea.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -10,56 +10,46 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :title, class: "label" %>
-    <%= form.text_field :title, class: "input", placeholder: "e.g. Subscription box for houseplants", autofocus: true %>
-  </div>
+  <%= form.label :title, class: "sr-only" %>
+  <%= form.text_field :title, class: "input-bare text-center text-3xl font-black sm:text-4xl", placeholder: "Name this idea…", autofocus: true %>
 
-  <div>
-    <%= form.label :description, "What's the idea?", class: "label" %>
-    <%= form.textarea :description, rows: 5, class: "input", placeholder: "The problem, the solution, why now…" %>
-  </div>
+  <%= form.label :description, class: "sr-only" %>
+  <%= form.textarea :description, rows: 4, class: "input-bare mt-6 border-b border-rule pb-6 text-[17px] leading-relaxed dark:border-night-rule",
+                    placeholder: "What's the idea? The problem, the solution, why now…" %>
 
-  <div class="grid gap-5 sm:grid-cols-3">
+  <% row_label = "text-sm font-bold text-stone-500 sm:pt-2 sm:text-right dark:text-stone-400" %>
+  <div class="mt-6 grid gap-x-6 gap-y-4 sm:grid-cols-[10rem_1fr]">
+    <%= form.label :status, class: row_label %>
+    <%= form.select :status, Idea::STATUSES.invert, {}, class: "input sm:max-w-xs" %>
+
+    <%= form.label :potential, class: row_label %>
+    <%= form.select :potential, (1..5).map { |n| ["#{'★' * n}#{'☆' * (5 - n)}  #{n} of 5", n] }, {}, class: "input sm:max-w-xs" %>
+
+    <%= form.label :category, class: row_label %>
     <div>
-      <%= form.label :category, class: "label" %>
-      <%= form.text_field :category, class: "input", list: "category-options", placeholder: "e.g. SaaS" %>
+      <%= form.text_field :category, class: "input sm:max-w-xs", list: "category-options", placeholder: "e.g. SaaS, E-commerce" %>
       <datalist id="category-options">
         <% Idea.categories.each do |c| %><option value="<%= c %>"><% end %>
       </datalist>
     </div>
-    <div>
-      <%= form.label :status, class: "label" %>
-      <%= form.select :status, Idea::STATUSES.invert, {}, class: "input" %>
-    </div>
-    <div>
-      <%= form.label :potential, "Potential (1–5)", class: "label" %>
-      <%= form.select :potential, (1..5).map { |n| ["#{'★' * n}#{'☆' * (5 - n)}  #{n}", n] }, {}, class: "input" %>
-    </div>
-  </div>
 
-  <div class="grid gap-5 sm:grid-cols-2">
-    <div>
-      <%= form.label :target_market, class: "label" %>
-      <%= form.text_field :target_market, class: "input", placeholder: "Who would pay for this?" %>
-    </div>
-    <div>
-      <%= form.label :revenue_model, class: "label" %>
-      <%= form.text_field :revenue_model, class: "input", placeholder: "e.g. Subscription, marketplace fee" %>
-    </div>
-  </div>
+    <%= form.label :target_market, "Who's it for?", class: row_label %>
+    <%= form.text_field :target_market, class: "input", placeholder: "Who would pay for this?" %>
 
-  <div>
-    <%= form.label :notes, class: "label" %>
+    <%= form.label :revenue_model, "How it makes money", class: row_label %>
+    <%= form.text_field :revenue_model, class: "input", placeholder: "e.g. Subscription, marketplace fee" %>
+
+    <%= form.label :notes, class: row_label %>
     <%= form.textarea :notes, rows: 4, class: "input", placeholder: "Competitors, links, next steps…" %>
+
+    <span class="hidden sm:block"></span>
+    <label class="inline-flex items-center gap-2 text-sm font-semibold">
+      <%= form.check_box :starred, class: "size-4 rounded accent-go" %> Star this idea
+    </label>
   </div>
 
-  <label class="inline-flex items-center gap-2 text-sm font-medium">
-    <%= form.check_box :starred, class: "size-4 rounded accent-indigo-600" %> Star this idea
-  </label>
-
-  <div class="flex items-center gap-2 border-t border-slate-100 pt-5 dark:border-slate-800">
-    <%= form.submit idea.new_record? ? "Save idea" : "Update idea", class: "btn btn-primary" %>
-    <%= link_to "Cancel", idea.new_record? ? ideas_path : idea, class: "btn btn-ghost" %>
+  <div class="mt-10 flex items-center justify-center gap-4">
+    <%= form.submit idea.new_record? ? "Save this idea" : "Save changes", class: "btn btn-go px-6 py-2 text-base" %>
+    <%= link_to "Cancel", idea.new_record? ? ideas_path : idea, class: "btn-link" %>
   </div>
 <% end %>
