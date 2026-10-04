@@ -1,8 +1,8 @@
-<%= form_with(model: idea) do |form| %>
+<%= form_with(model: idea, class: "space-y-8") do |form| %>
   <% if idea.errors.any? %>
-    <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-      <strong><%= pluralize(idea.errors.count, "thing") %> to fix before saving:</strong>
-      <ul class="mt-1 list-disc pl-5">
+    <div class="rounded-lg border border-red-300 bg-red-50 p-4 text-base text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200" role="alert">
+      <p class="font-semibold">Please fix <%= idea.errors.count == 1 ? "this" : "these" %> before saving:</p>
+      <ul class="mt-2 list-disc pl-6">
         <% idea.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -10,46 +10,56 @@
     </div>
   <% end %>
 
-  <%= form.label :title, class: "sr-only" %>
-  <%= form.text_field :title, class: "input-bare text-center text-3xl font-black sm:text-4xl", placeholder: "Name this idea…", autofocus: true %>
-
-  <%= form.label :description, class: "sr-only" %>
-  <%= form.textarea :description, rows: 4, class: "input-bare mt-6 border-b border-rule pb-6 text-[17px] leading-relaxed dark:border-night-rule",
-                    placeholder: "What's the idea? The problem, the solution, why now…" %>
-
-  <% row_label = "text-sm font-bold text-stone-500 sm:pt-2 sm:text-right dark:text-stone-400" %>
-  <div class="mt-6 grid gap-x-6 gap-y-4 sm:grid-cols-[10rem_1fr]">
-    <%= form.label :status, class: row_label %>
-    <%= form.select :status, Idea::STATUSES.invert, {}, class: "input sm:max-w-xs" %>
-
-    <%= form.label :potential, class: row_label %>
-    <%= form.select :potential, (1..5).map { |n| ["#{'★' * n}#{'☆' * (5 - n)}  #{n} of 5", n] }, {}, class: "input sm:max-w-xs" %>
-
-    <%= form.label :category, class: row_label %>
-    <div>
-      <%= form.text_field :category, class: "input sm:max-w-xs", list: "category-options", placeholder: "e.g. SaaS, E-commerce" %>
-      <datalist id="category-options">
-        <% Idea.categories.each do |c| %><option value="<%= c %>"><% end %>
-      </datalist>
-    </div>
-
-    <%= form.label :target_market, "Who's it for?", class: row_label %>
-    <%= form.text_field :target_market, class: "input", placeholder: "Who would pay for this?" %>
-
-    <%= form.label :revenue_model, "How it makes money", class: row_label %>
-    <%= form.text_field :revenue_model, class: "input", placeholder: "e.g. Subscription, marketplace fee" %>
-
-    <%= form.label :notes, class: row_label %>
-    <%= form.textarea :notes, rows: 4, class: "input", placeholder: "Competitors, links, next steps…" %>
-
-    <span class="hidden sm:block"></span>
-    <label class="inline-flex items-center gap-2 text-sm font-semibold">
-      <%= form.check_box :starred, class: "size-4 rounded accent-go" %> Star this idea
-    </label>
+  <div>
+    <%= form.label :title, "Idea name", class: "label" %>
+    <%= form.text_field :title, class: "input py-3 text-2xl font-bold", placeholder: "e.g. Subscription box for houseplants", autofocus: idea.new_record? %>
   </div>
 
-  <div class="mt-10 flex items-center justify-center gap-4">
-    <%= form.submit idea.new_record? ? "Save this idea" : "Save changes", class: "btn btn-go px-6 py-2 text-base" %>
-    <%= link_to "Cancel", idea.new_record? ? ideas_path : idea, class: "btn-link" %>
+  <div>
+    <%= form.label :description, "What's the idea?", class: "label" %>
+    <%= form.textarea :description, rows: 5, class: "input leading-relaxed", placeholder: "The problem, your solution, and why now" %>
+  </div>
+
+  <div class="max-w-sm">
+    <%= form.label :status, "Where is it at?", class: "label" %>
+    <%= form.select :status, Idea::STATUSES.invert, {}, class: "input" %>
+  </div>
+
+  <div class="max-w-sm">
+    <%= form.label :potential, "How big could it be?", class: "label" %>
+    <%= form.select :potential, potential_options, {}, class: "input" %>
+  </div>
+
+  <div class="max-w-sm">
+    <%= form.label :category, class: "label" %>
+    <%= form.text_field :category, class: "input", list: "category-options", placeholder: "e.g. SaaS" %>
+    <datalist id="category-options">
+      <% Idea.categories.each do |c| %><option value="<%= c %>"><% end %>
+    </datalist>
+    <p class="hint">Pick one you've used before or type a new one.</p>
+  </div>
+
+  <div>
+    <%= form.label :target_market, "Who is it for?", class: "label" %>
+    <%= form.text_field :target_market, class: "input", placeholder: "e.g. Freelance designers" %>
+  </div>
+
+  <div>
+    <%= form.label :revenue_model, "How will it make money?", class: "label" %>
+    <%= form.text_field :revenue_model, class: "input", placeholder: "e.g. $10 monthly subscription" %>
+  </div>
+
+  <div>
+    <%= form.label :notes, class: "label" %>
+    <%= form.textarea :notes, rows: 4, class: "input leading-relaxed", placeholder: "Competitors, links, next steps" %>
+  </div>
+
+  <label class="flex items-center gap-2 text-base font-semibold">
+    <%= form.check_box :starred, class: "size-5 rounded accent-brand-600" %> Star this idea
+  </label>
+
+  <div class="flex flex-wrap items-center gap-4 pt-8">
+    <%= form.submit idea.new_record? ? "Save idea" : "Save changes", class: "btn btn-primary btn-lg" %>
+    <%= link_to "Cancel", idea.new_record? ? ideas_path : idea, class: "link" %>
   </div>
 <% end %>

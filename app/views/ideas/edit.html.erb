@@ -1,6 +1,7 @@
 <% content_for :title, "Edit #{@idea.title} · Idea Vault" %>
 
-<%= link_to "◂ #{truncate(@idea.title, length: 40)}", @idea, class: "sheet-tab" %>
+<%= link_to @idea, class: "sheet-tab link" do %><%= icon(:arrow_left, class: "size-5") %> Back to idea<% end %>
 <div class="sheet">
+  <h1 class="mb-8 text-4xl font-extrabold">Edit idea</h1>
   <%= render "form", idea: @idea %>
 </div>

@@ -1,6 +1,7 @@
 <% content_for :title, "New idea · Idea Vault" %>
 
-<%= link_to "◂ All ideas", ideas_path, class: "sheet-tab" %>
+<%= link_to ideas_path, class: "sheet-tab link" do %><%= icon(:arrow_left, class: "size-5") %> All ideas<% end %>
 <div class="sheet">
+  <h1 class="mb-8 text-4xl font-extrabold">Add a new idea</h1>
   <%= render "form", idea: @idea %>
 </div>

@@ -1,46 +1,54 @@
 <% content_for :title, "#{@idea.title} · Idea Vault" %>
+<% not_set = tag.span("Not decided yet", class: "text-stone-500 dark:text-stone-400") %>
 
-<%= link_to "◂ All ideas", ideas_path, class: "sheet-tab" %>
+<%= link_to ideas_path, class: "sheet-tab link" do %><%= icon(:arrow_left, class: "size-5") %> All ideas<% end %>
 <article class="sheet">
-  <div class="flex items-center justify-between gap-2 sm:absolute sm:inset-x-6 sm:top-5">
-    <%= star_button(@idea) %>
-    <div class="flex items-center gap-2">
-      <%= link_to "Edit", edit_idea_path(@idea), class: "btn" %>
-      <%= button_to "Delete", @idea, method: :delete, class: "btn btn-danger", form_class: "inline",
-                    data: { turbo_confirm: "Delete \"#{@idea.title}\"? This can't be undone." } %>
+  <header>
+    <div class="flex flex-wrap items-center justify-end gap-2">
+      <%= star_button(@idea, labelled: true) %>
+      <%= link_to edit_idea_path(@idea), class: "btn" do %><%= icon(:pencil, class: "size-5") %> Edit<% end %>
+      <%= button_to @idea, method: :delete, class: "btn btn-quiet btn-quiet-danger", form_class: "inline",
+                    data: { turbo_confirm: "Delete \"#{@idea.title}\"? This can't be undone." } do %>
+        <%= icon(:trash, class: "size-5") %> Delete
+      <% end %>
     </div>
-  </div>
-
-  <header class="mt-6 text-center sm:mt-4">
-    <h1 class="text-3xl font-black tracking-tight sm:text-4xl"><%= @idea.title %></h1>
-    <div class="mt-3 flex flex-wrap items-center justify-center gap-3">
+    <h1 class="mt-8 text-4xl font-extrabold"><%= @idea.title %></h1>
+    <div class="mt-4 flex flex-wrap items-center gap-4">
       <%= status_badge(@idea) %>
       <%= potential_stars(@idea.potential) %>
       <% if @idea.category.present? %>
-        <%= link_to @idea.category, ideas_path(category: @idea.category), class: "tag" %>
+        <%= link_to @idea.category, ideas_path(category: @idea.category), class: "link text-sm" %>
       <% end %>
     </div>
-    <p class="mt-2 text-xs text-stone-500 dark:text-stone-400">
+    <p class="mt-4 text-sm text-stone-600 dark:text-stone-400">
       Added <%= @idea.created_at.to_date.to_fs(:long) %> · last updated <%= time_ago_in_words(@idea.updated_at) %> ago
     </p>
   </header>
 
-  <div class="mt-8 border-t border-rule pt-8 dark:border-night-rule">
+  <section class="mt-16">
+    <h2 class="eyebrow">The idea</h2>
     <% if @idea.description.present? %>
-      <div class="space-y-4 text-[17px] leading-relaxed"><%= simple_format @idea.description %></div>
+      <div class="mt-4 max-w-[65ch] space-y-4 text-xl leading-relaxed"><%= simple_format @idea.description %></div>
     <% else %>
-      <p class="text-center text-stone-500 italic">No description yet. <%= link_to "Add one", edit_idea_path(@idea), class: "btn-link not-italic" %></p>
+      <p class="mt-4 text-stone-600 dark:text-stone-400">No description yet. <%= link_to "Add one", edit_idea_path(@idea), class: "link" %></p>
     <% end %>
+  </section>
+
+  <div class="mt-16 grid gap-8 sm:grid-cols-2">
+    <section>
+      <h2 class="eyebrow">Who it's for</h2>
+      <p class="mt-2 text-xl"><%= @idea.target_market.presence || not_set %></p>
+    </section>
+    <section>
+      <h2 class="eyebrow">How it makes money</h2>
+      <p class="mt-2 text-xl"><%= @idea.revenue_model.presence || not_set %></p>
+    </section>
   </div>
 
-  <dl class="mt-8 grid gap-x-6 gap-y-3 border-t border-rule pt-8 sm:grid-cols-[10rem_1fr] dark:border-night-rule">
-    <dt class="text-sm font-bold text-stone-500 sm:text-right dark:text-stone-400">Who's it for?</dt>
-    <dd><%= @idea.target_market.presence || tag.span("Not decided yet", class: "text-stone-400") %></dd>
-    <dt class="text-sm font-bold text-stone-500 sm:text-right dark:text-stone-400">How it makes money</dt>
-    <dd><%= @idea.revenue_model.presence || tag.span("Not decided yet", class: "text-stone-400") %></dd>
-    <% if @idea.notes.present? %>
-      <dt class="text-sm font-bold text-stone-500 sm:text-right dark:text-stone-400">Notes</dt>
-      <dd class="space-y-3"><%= simple_format @idea.notes %></dd>
-    <% end %>
-  </dl>
+  <% if @idea.notes.present? %>
+    <section class="mt-16">
+      <h2 class="eyebrow">Notes</h2>
+      <div class="mt-4 max-w-[65ch] space-y-4 leading-relaxed"><%= simple_format @idea.notes %></div>
+    </section>
+  <% end %>
 </article>

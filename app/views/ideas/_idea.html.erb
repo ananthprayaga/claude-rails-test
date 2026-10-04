@@ -1,16 +1,16 @@
 <article id="<%= dom_id idea %>" class="card">
   <%= star_button(idea, extra_class: "absolute top-4 right-4 z-10") %>
-  <h3 class="pr-6 text-lg leading-snug font-extrabold">
+  <h3 class="pr-8 text-xl font-bold">
     <%= link_to idea.title, idea, class: "after:absolute after:inset-0 hover:underline" %>
   </h3>
   <% if idea.description.present? %>
-    <p class="mt-1.5 line-clamp-3 text-sm text-stone-600 dark:text-stone-400"><%= idea.description %></p>
+    <p class="mt-2 line-clamp-3 text-base text-stone-600 dark:text-stone-400"><%= idea.description %></p>
   <% end %>
-  <div class="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-4">
+  <div class="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-6">
     <%= status_badge(idea) %>
     <%= potential_stars(idea.potential) %>
   </div>
   <% if idea.category.present? %>
-    <p class="relative mt-2 text-xs text-stone-500"><%= link_to idea.category, ideas_path(category: idea.category), class: "tag" %></p>
+    <p class="relative mt-2 text-sm"><%= link_to idea.category, ideas_path(category: idea.category), class: "link" %></p>
   <% end %>
 </article>

@@ -1,85 +1,132 @@
 @import "tailwindcss";
 
-/* Warm, paper-like palette inspired by Basecamp's look. */
+/* Inter (SIL Open Font License), self-hosted so it works offline and without third-party requests. */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("inter-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("inter-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/*
+ * Design system
+ * - Personality: startup/upbeat (medium sans-serif, light warm greys, rounded elements).
+ * - One typeface: Inter. Type scale (px): 14 · 16 · 20 · 24 · 36 · 60. Normal text is 16px+,
+ *   long-form text 20px, headlines 36–60px bold with tightened letter spacing.
+ * - Colors: one main color (green) with tints/shades, warm grey (stone), amber accent for stars.
+ *   Blue is reserved for links. Body text is dark grey, never pure black.
+ * - Spacing: multiples of 16px between sections/groups, 8px steps inside components.
+ * - Radius: 8px inputs, 16px cards & sheets, pill buttons. Light shadows only on cards & toasts.
+ * - Motion: 200–300ms.
+ */
 @theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
   --color-cream: #f6f1e9;
-  --color-ink: #1d1d1d;
+  --color-ink: #292524;          /* stone-800: dark grey body text */
   --color-paper: #ffffff;
   --color-rule: #e7e0d5;
-  --color-go: #1f8a4c;
-  --color-go-dark: #186f3d;
-  --color-link: #2c6ecb;
+  --color-link: #1d5fb8;
   --color-night: #1c1b19;
   --color-night-paper: #282725;
   --color-night-rule: #3a3835;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* Main color + tints and shades */
+  --color-brand-50: #eefaf2;
+  --color-brand-100: #d5f2df;
+  --color-brand-200: #ade3c1;
+  --color-brand-300: #78cd9b;
+  --color-brand-500: #2ea660;
+  --color-brand-600: #1f8a4c;
+  --color-brand-700: #186f3d;
+  --color-brand-800: #155833;
+  --color-brand-900: #12482b;
+  --color-brand-950: #0a2818;
+
+  --default-transition-duration: 200ms;
+}
+
+@layer base {
+  body { @apply text-base leading-normal; }
+  h1, h2, h3 { @apply leading-tight tracking-tight; }
+  ::placeholder { @apply text-stone-500; }
 }
 
 @layer components {
-  /* Pill buttons */
+  /* Buttons: pill-shaped; the main color is reserved for the primary call to action. */
   .btn {
-    @apply inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-rule bg-paper px-4 py-1.5 text-sm font-semibold text-ink transition
-           hover:border-ink/40 dark:border-night-rule dark:bg-night-paper dark:text-stone-100 dark:hover:border-stone-400;
+    @apply inline-flex cursor-pointer items-center gap-2 rounded-full border border-rule bg-paper px-4 py-2 text-base font-semibold text-ink transition
+           hover:border-stone-400 dark:border-night-rule dark:bg-night-paper dark:text-stone-100 dark:hover:border-stone-500;
   }
-  .btn-go {
-    @apply border-go bg-go text-white hover:border-go-dark hover:bg-go-dark dark:border-go dark:bg-go dark:text-white dark:hover:bg-go-dark;
+  .btn-primary {
+    @apply border-brand-700 bg-brand-700 text-white hover:border-brand-800 hover:bg-brand-800
+           dark:border-brand-500 dark:bg-brand-500 dark:text-brand-950 dark:hover:bg-brand-300;
   }
-  .btn-danger { @apply text-red-700 hover:border-red-400 dark:text-red-400; }
-  .btn-link { @apply cursor-pointer text-sm font-semibold text-link hover:underline dark:text-sky-400; }
+  .btn-lg { @apply px-6 py-3 text-xl; }
+  .btn-quiet {
+    @apply border-transparent bg-transparent text-stone-600 hover:border-transparent hover:bg-stone-100
+           dark:bg-transparent dark:text-stone-300 dark:hover:bg-white/10;
+  }
+  .btn-quiet-danger { @apply hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950 dark:hover:text-red-300; }
 
+  .link { @apply font-semibold text-link underline-offset-4 hover:underline dark:text-sky-400; }
+
+  /* Forms: labels sit directly above their field in a single vertical line. */
+  .label { @apply mb-2 block text-base font-semibold text-ink dark:text-stone-200; }
+  .hint { @apply mt-2 text-sm text-stone-600 dark:text-stone-400; }
   .input {
-    @apply block w-full rounded-lg border border-rule bg-paper px-3 py-2 text-[15px] text-ink placeholder:text-stone-400
-           focus:border-link focus:outline-none focus:ring-2 focus:ring-link/20
-           dark:border-night-rule dark:bg-night dark:text-stone-100;
+    @apply block w-full rounded-lg border border-stone-300 bg-paper px-4 py-2 text-base text-ink transition
+           focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-600/15
+           dark:border-night-rule dark:bg-night dark:text-stone-100 dark:focus:border-brand-500;
   }
-  /* Borderless "type right on the page" fields used for the title & description. */
-  .input-bare {
-    @apply block w-full border-0 bg-transparent p-0 text-ink placeholder:text-stone-400 focus:outline-none focus:ring-0 dark:text-stone-100;
-  }
+  .field_with_errors { display: contents; }
+  .field_with_errors .input { @apply border-red-500 focus:ring-red-500/15; }
+  .field_with_errors .label { @apply text-red-700 dark:text-red-400; }
 
-  /* A white sheet of paper sitting on the cream desk, with a hint of the stack beneath it. */
+  /* A white sheet on the cream desk, with a hint of the stack beneath it. */
   .sheet {
-    @apply relative mx-auto max-w-4xl rounded-lg bg-paper px-6 py-8 sm:px-14 sm:py-12 dark:bg-night-paper;
+    @apply relative mx-auto max-w-3xl rounded-2xl bg-paper px-6 py-8 sm:px-16 sm:py-16 dark:bg-night-paper;
     --sheet-bg: var(--color-paper);
-    box-shadow: 0 1px 2px rgb(0 0 0 / .08), 0 6px 0 -3px var(--sheet-bg), 0 6px 2px -2px rgb(0 0 0 / .08),
-                0 12px 0 -6px var(--sheet-bg), 0 12px 2px -5px rgb(0 0 0 / .06);
+    box-shadow: 0 1px 3px rgb(0 0 0 / .06), 0 8px 0 -4px var(--sheet-bg), 0 8px 2px -3px rgb(0 0 0 / .06);
   }
   @media (prefers-color-scheme: dark) {
     .sheet { --sheet-bg: var(--color-night-paper); }
   }
-  /* The little tab above a sheet that links back to where you came from. */
   .sheet-tab {
-    @apply relative z-10 mx-auto -mb-px block w-fit rounded-t-lg bg-paper px-5 pt-2 pb-1 text-sm font-semibold text-link hover:underline
-           dark:bg-night-paper dark:text-sky-400;
+    @apply relative z-10 mx-auto -mb-px flex w-fit items-center gap-2 rounded-t-2xl bg-paper px-6 pt-2 pb-1 text-base dark:bg-night-paper;
   }
 
-  /* Project-style idea cards */
+  /* Idea cards: small, light shadow that grows on hover. */
   .card {
-    @apply relative flex min-h-44 flex-col rounded-xl bg-paper p-5 shadow-[0_1px_3px_rgb(0_0_0/.1)] transition
-           hover:shadow-[0_4px_14px_rgb(0_0_0/.12)] dark:bg-night-paper;
+    @apply relative flex min-h-48 flex-col rounded-2xl bg-paper p-6 shadow-[0_1px_3px_rgb(0_0_0/.08)] transition-shadow duration-300
+           hover:shadow-[0_8px_24px_rgb(0_0_0/.10)] dark:bg-night-paper;
   }
 
-  /* Section heading with rules on either side, e.g. ——— Starred ——— */
-  .divider {
-    @apply my-8 flex items-center gap-4 text-xs font-bold uppercase tracking-[.14em] text-stone-500
-           before:h-px before:flex-1 before:bg-rule after:h-px after:flex-1 after:bg-rule
-           dark:text-stone-400 dark:before:bg-night-rule dark:after:bg-night-rule;
-  }
+  /* Small all-caps section titles */
+  .eyebrow { @apply text-sm font-bold tracking-widest text-stone-600 uppercase dark:text-stone-400; }
 
-  .badge { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold; }
-  .badge::before { content: ""; @apply size-1.5 rounded-full bg-current; }
-  .badge-brainstorming { @apply bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300; }
-  .badge-researching   { @apply bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300; }
-  .badge-validating    { @apply bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300; }
-  .badge-building      { @apply bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300; }
-  .badge-launched      { @apply bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300; }
-  .badge-shelved       { @apply bg-stone-200 text-stone-700 dark:bg-stone-800 dark:text-stone-400; }
-
-  .tag { @apply text-xs font-semibold text-link hover:underline dark:text-sky-400; }
+  /* Status badges: the pipeline darkens through tints of the main color; shelved is grey. */
+  .badge { @apply inline-flex items-center rounded-full px-2 py-0.5 text-sm font-semibold; }
+  .badge-brainstorming { @apply bg-brand-50 text-brand-800 ring-1 ring-brand-200 ring-inset dark:bg-brand-950 dark:text-brand-200 dark:ring-brand-800; }
+  .badge-researching   { @apply bg-brand-100 text-brand-800 dark:bg-brand-900 dark:text-brand-100; }
+  .badge-validating    { @apply bg-brand-200 text-brand-900 dark:bg-brand-800 dark:text-brand-50; }
+  .badge-building      { @apply bg-brand-300 text-brand-950 dark:bg-brand-700 dark:text-white; }
+  .badge-launched      { @apply bg-brand-700 text-white dark:bg-brand-300 dark:text-brand-950; }
+  .badge-shelved       { @apply bg-stone-200 text-stone-700 dark:bg-stone-800 dark:text-stone-300; }
 
   /* Filter tabs */
-  .pill-tab {
-    @apply rounded-full px-3 py-1 text-sm font-semibold text-stone-600 hover:bg-black/5 dark:text-stone-300 dark:hover:bg-white/10;
+  .tab {
+    @apply rounded-full px-4 py-1 text-base font-semibold text-stone-600 transition hover:bg-black/5 dark:text-stone-300 dark:hover:bg-white/10;
   }
-  .pill-tab-active { @apply bg-ink text-white hover:bg-ink dark:bg-stone-100 dark:text-ink dark:hover:bg-stone-100; }
+  .tab-active { @apply bg-ink text-white hover:bg-ink dark:bg-stone-100 dark:text-ink dark:hover:bg-stone-100; }
 }
