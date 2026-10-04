@@ -32,7 +32,7 @@ class IdeasController < ApplicationController
     @idea = Idea.new(idea_params)
 
     if @idea.save
-      redirect_to @idea, notice: "Idea saved."
+      redirect_to root_path, notice: "Idea saved."
     else
       render :new, status: :unprocessable_content
     end
@@ -41,7 +41,7 @@ class IdeasController < ApplicationController
   # PATCH/PUT /ideas/1
   def update
     if @idea.update(idea_params)
-      redirect_to @idea, notice: "Idea updated.", status: :see_other
+      redirect_to root_path, notice: "Idea updated.", status: :see_other
     else
       render :edit, status: :unprocessable_content
     end

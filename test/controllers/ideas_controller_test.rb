@@ -43,7 +43,8 @@ class IdeasControllerTest < ActionDispatch::IntegrationTest
       post ideas_url, params: { idea: { title: "Drone window cleaning", category: "Services", status: "researching", potential: 5 } }
     end
 
-    assert_redirected_to idea_url(Idea.last)
+    assert_redirected_to root_url
+    assert_equal "Drone window cleaning", Idea.last.title
   end
 
   test "rejects an idea without a title" do
@@ -66,7 +67,7 @@ class IdeasControllerTest < ActionDispatch::IntegrationTest
 
   test "should update idea" do
     patch idea_url(@idea), params: { idea: { status: "launched" } }
-    assert_redirected_to idea_url(@idea)
+    assert_redirected_to root_url
     assert_equal "launched", @idea.reload.status
   end
 
